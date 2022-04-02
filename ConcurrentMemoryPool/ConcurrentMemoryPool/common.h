@@ -3,7 +3,8 @@
 #include <assert.h>
 #include <thread>
 #include <mutex>
-
+#include <algorithm>
+#include <Windows.h>
 using std::cout;
 using std::endl;
 
@@ -11,6 +12,8 @@ static const size_t kAlignment = 8;
 static const size_t kMaxSize = 1024 * 256;
 static const size_t NFREELIST = 104;//自由链表的个数。
 static const size_t NSPANLIST = 1024;
+static const size_t NPAGE = 128;
+static const size_t kPageShift = 13;
 
 
 //_WIN64要放在上面，因为在64位环境中既有_WIN32也有_WIN64
@@ -21,6 +24,25 @@ static const size_t NSPANLIST = 1024;
 #endif
 
 
+	// 直接去堆上按页申请空间
+inline static void* SystemAlloc(size_t kpage)
+{
+#ifdef _WIN32
+	void* ptr = VirtualAlloc(0, kpage << 13, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+#else
+	// linux下brk mmap等
+#endif
+
+	if (ptr == nullptr)
+		throw std::bad_alloc();
+	return ptr;
+}
+
+
+static void*& NextObj(void* obj)
+{
+	return *(void**)obj;
+}
 
 class FreeList
 {
@@ -31,11 +53,7 @@ public:
 		//头插
 		*(void**)obj = _head;
 		_head = obj;
-	}
-
-	void* NextObj(void* obj)
-	{
-		return *(void**)obj;
+		_length++;
 	}
 
 	void* Pop()
@@ -44,6 +62,7 @@ public:
 			//自由链表不为空，直接弹出头节点.
 			void* obj = _head;
 			_head = NextObj(_head);
+			_length--;
 			return obj;
 		}
 		return nullptr;
@@ -53,8 +72,21 @@ public:
 	{
 		return  _head == nullptr;
 	}
+
+	size_t length() const {
+		return _length;
+	}
+
+	//插入一段范围
+	void PushRange(void* start, void* end, int n)
+	{
+		NextObj(end) = _head;
+		_head = start;
+		_length += n;
+	}
 private:
 	void* _head = nullptr;
+	size_t _length = 1;//链表的长度
 };
 
 class SizeClass
@@ -129,6 +161,31 @@ public:
 		}
 		return -1;
 	}
+	
+	//计算出一次向中心缓存索要的个数。
+	static int NumMoveSize(size_t bytes)
+	{
+		if (bytes == 0) return 0;
+		// Use approx 64k transfers between thread and central caches.
+		int num = static_cast<int>(64 * 1024.0 / bytes);
+		if (num < 2)
+			num = 2;
+		//32768
+		if (num > 32768)
+			num = 32768;
+		return num;
+	}
+
+	//根据申请的大小计算出获取的页数
+	static size_t MnmMovePage(size_t bytes)
+	{
+		size_t number = NumMoveSize(bytes);
+		size_t npage = (bytes*number) >> kPageShift;
+		if (npage == 0)
+			npage = 1;
+		return npage;
+	}
+
 private:
 	int index_arr[NFREELIST];
 };
@@ -143,6 +200,7 @@ public:
 	PAGE_ID _pagId = 0; //页号
 	void* _freeList = nullptr; //自由链表
 	size_t count = 0;//记录分配情况
+	size_t bytes = 0;
 };
 
 class SpanList
@@ -173,6 +231,25 @@ public:
 		prev->_next = pos->_next;
 		pos->_prev = prev;
 	}
-private:
+
+	Span* PopFront()
+	{
+		assert(!Empty());
+		Span* top = _head->_next;
+		Pop(top);
+		return top;
+	}
+
+	//头插
+	void PushFront(Span* newSpan)
+	{
+		Push(_head, newSpan);
+	}
+
+	bool Empty()
+	{
+		return _head == _head->_next;
+	}
 	Span* _head;
+	std::mutex _mlock;
 };

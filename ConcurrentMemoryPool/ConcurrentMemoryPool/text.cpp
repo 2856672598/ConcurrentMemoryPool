@@ -6,9 +6,9 @@ using std::set;
 
 void fun1()
 {
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 10; i++)
 	{
-		ConcurrentAlloc(5);
+		printf("%d\n", ConcurrentAlloc(65536));
 	}
 }
 
@@ -19,7 +19,7 @@ void ConcurrentAlloc_Text()
 
 	p1.join();
 	p2.join();
-
+	//fun1();
 }
 
 int main()

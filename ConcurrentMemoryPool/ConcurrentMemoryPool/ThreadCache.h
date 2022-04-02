@@ -8,7 +8,7 @@ public:
 	void  FreeMemory(void* p, size_t size);
 
 	//从中央缓存获取
-	void* FetchFromCentralCache(size_t size);
+	void* FetchFromCentralCache(size_t cl, size_t size);
 private:
 	FreeList _freelist[NFREELIST];
 };
