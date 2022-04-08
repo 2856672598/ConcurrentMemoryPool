@@ -13,6 +13,7 @@ public:
 
 	size_t FetchRangeObj(void*& start, void*& end, size_t batchNum, size_t size);
 	Span* GetOneSpan(size_t bytes, size_t number);
+	void ReleaseToCentralCache(void* begin, int bytes);
 
 private:
 	CentreCache()

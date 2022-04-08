@@ -21,10 +21,24 @@ void* ThreadCache::AllocateMemory(size_t bytes)
 	return nullptr;
 }
 
+
+void ThreadCache::ListTooLong(FreeList* list, int bytes)
+{
+	size_t batch_size = SizeClass::NumMoveSize(bytes);
+	void* start = nullptr, *end = nullptr;
+	list->PopRange(start, end, batch_size);
+	CentreCache::GetInstance()->ReleaseToCentralCache(start, bytes);
+}
+
 void  ThreadCache::FreeMemory(void* p, size_t size)
 {
 	size_t index = SizeClass().Index(size);
 	_freelist[index].Push(p);
+	//当自由链表太长时需要进行回收
+	if (_freelist[index].length() >= SizeClass::NumMoveSize(size))
+	{
+		ListTooLong(&_freelist[index], size);
+	}
 }
 
 void* ThreadCache::FetchFromCentralCache(size_t cl, size_t bytes)

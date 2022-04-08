@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <thread>
 #include <mutex>
+#include <unordered_map>
 #include <algorithm>
 #include <Windows.h>
 using std::cout;
@@ -12,7 +13,7 @@ static const size_t kAlignment = 8;
 static const size_t kMaxSize = 1024 * 256;
 static const size_t NFREELIST = 104;//自由链表的个数。
 static const size_t NSPANLIST = 1024;
-static const size_t NPAGE = 128;
+static const size_t NPAGE = 129;
 static const size_t kPageShift = 13;
 
 
@@ -62,7 +63,6 @@ public:
 			//自由链表不为空，直接弹出头节点.
 			void* obj = _head;
 			_head = NextObj(_head);
-			_length--;
 			return obj;
 		}
 		return nullptr;
@@ -84,6 +84,21 @@ public:
 		_head = start;
 		_length += n;
 	}
+
+	void PopRange(void* start, void* end, int n)
+	{
+		assert(_length >= n);
+		start = end = _head;
+		while (n > 1)
+		{
+			end = NextObj(end);
+			n--;
+		}
+		_head = NextObj(end);
+		NextObj(end) = nullptr;
+		_length -= n;
+	}
+
 private:
 	void* _head = nullptr;
 	size_t _length = 1;//链表的长度
@@ -163,7 +178,7 @@ public:
 	}
 	
 	//计算出一次向中心缓存索要的个数。
-	static int NumMoveSize(size_t bytes)
+	static size_t NumMoveSize(size_t bytes)
 	{
 		if (bytes == 0) return 0;
 		// Use approx 64k transfers between thread and central caches.
@@ -173,6 +188,7 @@ public:
 		//32768
 		if (num > 32768)
 			num = 32768;
+		num = 1;
 		return num;
 	}
 
@@ -200,7 +216,8 @@ public:
 	PAGE_ID _pagId = 0; //页号
 	void* _freeList = nullptr; //自由链表
 	size_t count = 0;//记录分配情况
-	size_t bytes = 0;
+	bool _isUse = false;//记录当前sapn是否在使用
+	//size_t bytes = 0;
 };
 
 class SpanList

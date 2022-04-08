@@ -1,8 +1,10 @@
 ﻿  CenterCache.cpp
-d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\centercache.cpp(21): warning C4018: “<”: 有符号/无符号不匹配
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\common.h(90): warning C4018: “>=”: 有符号/无符号不匹配
   PageCache.cpp
-  text.cpp
-d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\text.cpp(11): warning C4477: “printf”: 格式字符串“%d”需要类型“int”的参数，但可变参数 1 拥有了类型“void *”
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\common.h(90): warning C4018: “>=”: 有符号/无符号不匹配
   ThreadCache.cpp
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\common.h(90): warning C4018: “>=”: 有符号/无符号不匹配
+  text.cpp
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\common.h(90): warning C4018: “>=”: 有符号/无符号不匹配
   正在生成代码...
   ConcurrentMemoryPool.vcxproj -> D:\Githup\ConcurrentMemoryPool\ConcurrentMemoryPool\Debug\ConcurrentMemoryPool.exe

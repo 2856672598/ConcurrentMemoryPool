@@ -17,7 +17,7 @@ size_t CentreCache::FetchRangeObj(void*& start, void*& end, size_t bytes, size_t
 	start = span->_freeList;
 	//从list 中可以进行读取
 	end = start;
-	int count = 1, i = 0;
+	size_t count = 1, i = 0;
 	while (i < number - 1 && NextObj(end) != nullptr)
 	{
 		end = NextObj(end);
@@ -26,7 +26,7 @@ size_t CentreCache::FetchRangeObj(void*& start, void*& end, size_t bytes, size_t
 	}
 	span->_freeList = NextObj(end);
 	NextObj(end) = nullptr;
-
+	span->count += count;
 	_spanList[index]._mlock.unlock();
 	return count;
 }
@@ -51,16 +51,40 @@ Span* CentreCache::GetOneSpan(size_t bytes, size_t number)
 	char* start = (char*)(newSpan->_pagId << kPageShift);
 	char* end = start + (newSpan->_npage << kPageShift);
 
+	newSpan->_isUse = true;
 	newSpan->_freeList = start;
 	void* tail = start;
-	while (start < end)
+	newSpan->count++;
+	while (start + bytes < end)
 	{
 		NextObj(tail) = start + bytes;
 		tail = NextObj(tail);
 		start += bytes;
+		newSpan->count++;
 	}
 	NextObj(tail) = nullptr;
 
 	_spanList[index].PushFront(newSpan);
 	return newSpan;
+}
+
+void CentreCache::ReleaseToCentralCache(void* begin, int bytes)
+{
+	//
+	void* cur = begin;
+	while (cur)
+	{
+		void* next = NextObj(cur);
+
+		Span* span = PageChche::GetInstance()->AddrToSpan(cur);
+		NextObj(cur) = span->_freeList;
+		span->_freeList = cur;
+		span->count--;//回收节点进行--
+
+		if (span->count == 0) {
+			span->_isUse = false;
+			//全部回收完成-->还给下一层的page
+		}
+		cur = next;
+	}
 }

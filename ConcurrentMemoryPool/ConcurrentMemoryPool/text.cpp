@@ -4,23 +4,23 @@
 #include <thread>
 using std::set;
 
-void fun1()
-{
-	for (int i = 0; i < 10; i++)
-	{
-		printf("%d\n", ConcurrentAlloc(65536));
-	}
-}
-
-void ConcurrentAlloc_Text()
-{
-	std::thread p1(fun1);
-	std::thread p2(fun1);
-
-	p1.join();
-	p2.join();
-	//fun1();
-}
+//void fun1()
+//{
+//	for (int i = 0; i < 10; i++)
+//	{
+//		printf("%d\n", ConcurrentAlloc(65536));
+//	}
+//}
+//
+//void ConcurrentAlloc_Text()
+//{
+//	std::thread p1(fun1);
+//	std::thread p2(fun1);
+//
+//	p1.join();
+//	p2.join();
+//	//fun1();
+//}
 
 int main()
 {
@@ -44,7 +44,13 @@ int main()
 
 	//cout << SizeClass().Index(128) << endl;
 
-	ConcurrentAlloc_Text();
+	//ConcurrentAlloc_Text();
 	//auto p = new ThreadCache;
+	for (int i = 0; i < 1024; i++)
+	{
+		ConcurrentAlloc(1020);
+	}
+	//ConcurrentAlloc(1024);
+	//ConcurrentAlloc(7);
 	return 0;
 }

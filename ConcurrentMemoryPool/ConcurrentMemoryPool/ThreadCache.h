@@ -9,6 +9,7 @@ public:
 
 	//从中央缓存获取
 	void* FetchFromCentralCache(size_t cl, size_t size);
+	void ListTooLong(FreeList* list, int bytes);
 private:
 	FreeList _freelist[NFREELIST];
 };
