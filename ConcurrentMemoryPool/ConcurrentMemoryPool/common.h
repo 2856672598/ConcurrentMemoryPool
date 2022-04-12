@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <vector>
 #include <assert.h>
 #include <thread>
 #include <mutex>
@@ -36,9 +37,14 @@ inline static void* SystemAlloc(size_t kpage)
 
 	if (ptr == nullptr)
 		throw std::bad_alloc();
+	cout << "申请" << kpage << "页" << endl;
 	return ptr;
 }
 
+inline static void SystemFree(void* ptr)
+{
+	VirtualFree(ptr, 0, MEM_DECOMMIT);
+}
 
 static void*& NextObj(void* obj)
 {
@@ -52,7 +58,7 @@ public:
 	void Push(void* obj)
 	{
 		//头插
-		*(void**)obj = _head;
+		NextObj(obj) = _head;
 		_head = obj;
 		_length++;
 	}
@@ -63,6 +69,7 @@ public:
 			//自由链表不为空，直接弹出头节点.
 			void* obj = _head;
 			_head = NextObj(_head);
+			_length--;
 			return obj;
 		}
 		return nullptr;
@@ -73,7 +80,11 @@ public:
 		return  _head == nullptr;
 	}
 
-	size_t length() const {
+	size_t& MaxLength() {
+		return _maxLength;
+	}
+	size_t Length()
+	{
 		return _length;
 	}
 
@@ -85,14 +96,15 @@ public:
 		_length += n;
 	}
 
-	void PopRange(void* start, void* end, int n)
+	void PopRange(void*& start, void*& end, int n)
 	{
 		assert(_length >= n);
 		start = end = _head;
-		while (n > 1)
+		int flag = n;
+		while (flag > 1)
 		{
 			end = NextObj(end);
-			n--;
+			flag--;
 		}
 		_head = NextObj(end);
 		NextObj(end) = nullptr;
@@ -101,7 +113,8 @@ public:
 
 private:
 	void* _head = nullptr;
-	size_t _length = 1;//链表的长度
+	size_t _length = 0;//链表的长度
+	size_t _maxLength = 1;
 };
 
 class SizeClass
@@ -149,9 +162,6 @@ public:
 		//	//16 - 128字节按照 16对齐
 		//	alignment = 16;
 		//}
-		//if (alignment > kPageSize) {
-		//	alignment = kPageSize;
-		//}
 		return alignment;
 	}
 
@@ -188,12 +198,12 @@ public:
 		//32768
 		if (num > 32768)
 			num = 32768;
-		num = 1;
+		//num = 1;
 		return num;
 	}
 
 	//根据申请的大小计算出获取的页数
-	static size_t MnmMovePage(size_t bytes)
+	static size_t NnmMovePage(size_t bytes)
 	{
 		size_t number = NumMoveSize(bytes);
 		size_t npage = (bytes*number) >> kPageShift;

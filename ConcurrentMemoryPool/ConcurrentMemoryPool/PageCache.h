@@ -1,6 +1,6 @@
 #pragma once
 #include "common.h"
-
+#include "ObjectPool.h"
 class PageChche
 {
 public:
@@ -25,6 +25,7 @@ public:
 		return nullptr;
 	}
 
+	void ReleaseToPageCache(Span* span);
 private:
 	PageChche(const PageChche&) = delete;
 	PageChche()
@@ -32,4 +33,5 @@ private:
 	SpanList _pageLists[NPAGE];
 	static PageChche _sInst;
 	std::unordered_map<int, Span*>pageNumberToSpanMap;
+	ObjectPool<Span> _objPool;
 };

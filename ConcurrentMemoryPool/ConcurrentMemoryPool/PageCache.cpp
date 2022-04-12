@@ -4,6 +4,17 @@ PageChche PageChche::_sInst;
 
 Span* PageChche::NewSpan(size_t n)
 {
+	if (n > NPAGE - 1) {
+		//大于128页的直接向堆申请
+		void* ptr = SystemAlloc(n);
+		Span* span = _objPool.New();
+		//Span* span = new Span;
+		span->_pagId = (unsigned)ptr >> kPageShift;
+		span->_npage = n;
+		pageNumberToSpanMap[span->_pagId] = span;
+		return span;
+	}
+
 	if (!_pageLists[n].Empty()) {
 
 		Span* nSpan = _pageLists[n].PopFront();
@@ -20,7 +31,7 @@ Span* PageChche::NewSpan(size_t n)
 		if (!_pageLists[i].Empty()) {
 			//进行切割
 			Span* iSpan = _pageLists[i].PopFront();
-			Span* span = new Span;
+			Span* span = _objPool.New();
 			span->_pagId = iSpan->_pagId;
 			span->_npage = n;
 
@@ -45,10 +56,70 @@ Span* PageChche::NewSpan(size_t n)
 	cout << "申请" << n << "页空间" << endl;
 	//没有找到合适的span进行切割-->去系统申请
 	void* ptr = SystemAlloc(NPAGE - 1);
-	Span* bigSpan = new Span;
+	Span* bigSpan = _objPool.New();
 	bigSpan->_pagId = (unsigned)ptr >> kPageShift;
 	bigSpan->_npage = NPAGE - 1;
 	_pageLists[NPAGE - 1].PushFront(bigSpan);
 
 	return NewSpan(n);
+}
+
+//合并数据块
+void PageChche::ReleaseToPageCache(Span* span)
+{
+
+	if (span->_npage >= NPAGE) {
+		//大于NPAGE的直接还给堆
+		SystemFree((void*)(span->_pagId >> kPageShift));
+		_objPool.Delete(span);
+		//delete span;
+		return;
+	}
+
+	//向前合并
+	while (true)
+	{
+		size_t prevId = span->_pagId - 1;
+		//前面的位置不存在
+		if (pageNumberToSpanMap.find(prevId) == pageNumberToSpanMap.end()) {
+			break;
+		}
+		//前面的span在使用
+		Span* prevSpan = pageNumberToSpanMap[prevId];
+		if (prevSpan->_isUse == true || prevSpan->_npage + span->_npage >= NPAGE) {
+			break;
+		}
+
+		span->_npage += prevSpan->_npage;
+		span->_pagId = prevSpan->_pagId;
+		_pageLists[prevSpan->_npage].Pop(prevSpan);
+		_objPool.Delete(prevSpan);
+		//delete prevSpan;
+	}
+	//向后合并
+	while (true)
+	{
+		size_t nextId = span->_pagId + span->_npage;
+		if (pageNumberToSpanMap.find(nextId) == pageNumberToSpanMap.end()) {
+			break;
+		}
+		Span* nextSpan = pageNumberToSpanMap[nextId];
+		if (nextSpan->_isUse == true || nextSpan->_npage + span->_npage >= NPAGE) {
+			break;
+		}
+
+		_pageLists[nextSpan->_npage].Pop(nextSpan);
+		//可以进行合并
+		span->_npage += nextSpan->_npage;
+		_objPool.Delete(nextSpan);
+		//delete nextSpan;
+	}
+
+	//将合并好的span添加到对应的桶中
+	_pageLists[span->_npage].PushFront(span);
+	span->_isUse = false;
+	pageNumberToSpanMap[span->_pagId] = span;
+	pageNumberToSpanMap[span->_pagId + span->_npage - 1] = span;
+	cout << span->_npage << "页空间进行合并" << endl;
+
 }

@@ -12,9 +12,12 @@ size_t CentreCache::FetchRangeObj(void*& start, void*& end, size_t bytes, size_t
 	_spanList[index]._mlock.lock();
 
 	Span* span = GetOneSpan(bytes, number);
+
 	assert(span);
 
 	start = span->_freeList;
+	if (start == nullptr)
+		int c = 0;
 	//从list 中可以进行读取
 	end = start;
 	size_t count = 1, i = 0;
@@ -45,7 +48,7 @@ Span* CentreCache::GetOneSpan(size_t bytes, size_t number)
 
 	PageChche::GetInstance()->_mlock.lock();
 	//SpanList中没有未分配对象的span，去PageCache申请
-	Span*  newSpan = PageChche::GetInstance()->NewSpan(SizeClass::MnmMovePage(bytes));
+	Span*  newSpan = PageChche::GetInstance()->NewSpan(SizeClass::NnmMovePage(bytes));
 	PageChche::GetInstance()->_mlock.unlock();
 	//将newSpan进行切割
 	char* start = (char*)(newSpan->_pagId << kPageShift);
@@ -54,23 +57,27 @@ Span* CentreCache::GetOneSpan(size_t bytes, size_t number)
 	newSpan->_isUse = true;
 	newSpan->_freeList = start;
 	void* tail = start;
-	newSpan->count++;
+	//newSpan->count = 0;
 	while (start + bytes < end)
 	{
 		NextObj(tail) = start + bytes;
 		tail = NextObj(tail);
 		start += bytes;
-		newSpan->count++;
+		//newSpan->count++;
 	}
 	NextObj(tail) = nullptr;
 
 	_spanList[index].PushFront(newSpan);
+	if (newSpan->_freeList == nullptr)
+		int i = 0;
 	return newSpan;
 }
 
 void CentreCache::ReleaseToCentralCache(void* begin, int bytes)
 {
-	//
+	//访问CentreCache时，需要加上桶锁。
+	int index = SizeClass().Index(bytes);
+	_spanList[index]._mlock.lock();
 	void* cur = begin;
 	while (cur)
 	{
@@ -84,7 +91,12 @@ void CentreCache::ReleaseToCentralCache(void* begin, int bytes)
 		if (span->count == 0) {
 			span->_isUse = false;
 			//全部回收完成-->还给下一层的page
+			PageChche::GetInstance()->_mlock.lock();
+			PageChche::GetInstance()->ReleaseToPageCache(span);
+			PageChche::GetInstance()->_mlock.unlock();
 		}
 		cur = next;
 	}
+
+	_spanList[index]._mlock.unlock();
 }

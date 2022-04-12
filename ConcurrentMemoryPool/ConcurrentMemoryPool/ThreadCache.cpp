@@ -1,13 +1,12 @@
 #include "common.h"
 #include "ThreadCache.h"
 #include "CenterCache.h"
-
+#include "PageCache.h"
 //申请空间
 void* ThreadCache::AllocateMemory(size_t bytes)
 {
 	//进行对齐
 	bytes = SizeClass::RoundUp(bytes);
-
 	int index = SizeClass().Index(bytes);
 	if (!_freelist[index].Empty()) {
 		//可以申请
@@ -24,18 +23,21 @@ void* ThreadCache::AllocateMemory(size_t bytes)
 
 void ThreadCache::ListTooLong(FreeList* list, int bytes)
 {
-	size_t batch_size = SizeClass::NumMoveSize(bytes);
-	void* start = nullptr, *end = nullptr;
-	list->PopRange(start, end, batch_size);
+	//size_t batch_size = SizeClass::NumMoveSize(bytes);
+	void* start = nullptr;
+	void *end = nullptr;
+	list->PopRange(start, end, list->MaxLength());
 	CentreCache::GetInstance()->ReleaseToCentralCache(start, bytes);
 }
 
 void  ThreadCache::FreeMemory(void* p, size_t size)
 {
+	size = SizeClass::RoundUp(size);
+
 	size_t index = SizeClass().Index(size);
 	_freelist[index].Push(p);
 	//当自由链表太长时需要进行回收
-	if (_freelist[index].length() >= SizeClass::NumMoveSize(size))
+	if (_freelist[index].Length() >= _freelist[index].MaxLength())
 	{
 		ListTooLong(&_freelist[index], size);
 	}
@@ -46,8 +48,10 @@ void* ThreadCache::FetchFromCentralCache(size_t cl, size_t bytes)
 	FreeList* list = &_freelist[cl];
 
 	int batch_size = SizeClass::NumMoveSize(bytes);
-	int num_to_move = std::min<int>(list->length(), batch_size);//申请的个数
-
+	int num_to_move = std::min<int>(list->MaxLength(), batch_size);//申请的个数
+	if (num_to_move == list->MaxLength())
+		list->MaxLength() += 1;
+	cout << "申请" << num_to_move << " " << list->MaxLength() << endl;
 	void *start, *end;
 	//获取到的个数
 	int fetch_count = CentreCache::GetInstance()->FetchRangeObj(start, end, bytes, num_to_move);
