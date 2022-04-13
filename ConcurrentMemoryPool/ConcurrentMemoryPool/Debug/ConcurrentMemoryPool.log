@@ -1,4 +1,3 @@
-﻿  text.cpp
-d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\common.h(101): warning C4018: “>=”: 有符号/无符号不匹配
-d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\text.cpp(14): warning C4018: “<”: 有符号/无符号不匹配
+﻿  Performance.cpp
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\common.h(106): warning C4018: “>=”: 有符号/无符号不匹配
   ConcurrentMemoryPool.vcxproj -> D:\Githup\ConcurrentMemoryPool\ConcurrentMemoryPool\Debug\ConcurrentMemoryPool.exe

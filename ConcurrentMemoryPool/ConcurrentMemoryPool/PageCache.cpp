@@ -120,6 +120,6 @@ void PageChche::ReleaseToPageCache(Span* span)
 	span->_isUse = false;
 	pageNumberToSpanMap[span->_pagId] = span;
 	pageNumberToSpanMap[span->_pagId + span->_npage - 1] = span;
-	cout << span->_npage << "页空间进行合并" << endl;
+	cout << span->_npage << "页空间进行合并,线程ID" << std::this_thread::get_id() << endl;
 
 }

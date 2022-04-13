@@ -14,6 +14,7 @@ public:
 
 	Span* AddrToSpan(void* addr)
 	{
+		std::unique_lock<std::mutex> lock(_mlock);
 		//将地址转化为页号
 		size_t pageId = (size_t)addr >> kPageShift;
 		auto ret = pageNumberToSpanMap.find(pageId);

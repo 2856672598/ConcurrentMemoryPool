@@ -32,7 +32,7 @@ void ThreadCache::ListTooLong(FreeList* list, int bytes)
 
 void  ThreadCache::FreeMemory(void* p, size_t size)
 {
-	size = SizeClass::RoundUp(size);
+	//size = SizeClass::RoundUp(size);
 
 	size_t index = SizeClass().Index(size);
 	_freelist[index].Push(p);
@@ -52,7 +52,7 @@ void* ThreadCache::FetchFromCentralCache(size_t cl, size_t bytes)
 	if (num_to_move == list->MaxLength())
 		list->MaxLength() += 1;
 	cout << "申请" << num_to_move << " " << list->MaxLength() << endl;
-	void *start, *end;
+	void *start = nullptr, *end = nullptr;
 	//获取到的个数
 	int fetch_count = CentreCache::GetInstance()->FetchRangeObj(start, end, bytes, num_to_move);
 	assert(fetch_count > 0);

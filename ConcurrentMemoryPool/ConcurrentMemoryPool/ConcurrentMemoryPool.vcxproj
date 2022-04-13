@@ -134,6 +134,7 @@
   <ItemGroup>
     <ClCompile Include="CenterCache.cpp" />
     <ClCompile Include="PageCache.cpp" />
+    <ClCompile Include="Performance.cpp" />
     <ClCompile Include="text.cpp" />
     <ClCompile Include="ThreadCache.cpp" />
   </ItemGroup>

@@ -37,7 +37,7 @@ inline static void* SystemAlloc(size_t kpage)
 
 	if (ptr == nullptr)
 		throw std::bad_alloc();
-	cout << "申请" << kpage << "页" << endl;
+	//cout << "申请" << kpage << "页" << endl;
 	return ptr;
 }
 
@@ -57,8 +57,11 @@ public:
 	//向自由链表中加入节点
 	void Push(void* obj)
 	{
+		assert(obj);
 		//头插
 		NextObj(obj) = _head;
+		if ((unsigned)_head == 2)
+			int i = 0;
 		_head = obj;
 		_length++;
 	}
@@ -68,6 +71,8 @@ public:
 		if (_head != nullptr){
 			//自由链表不为空，直接弹出头节点.
 			void* obj = _head;
+			if ((unsigned)_head == 2)
+				int i = 0;
 			_head = NextObj(_head);
 			_length--;
 			return obj;
@@ -99,7 +104,8 @@ public:
 	void PopRange(void*& start, void*& end, int n)
 	{
 		assert(_length >= n);
-		start = end = _head;
+		start = _head;
+		end = start;
 		int flag = n;
 		while (flag > 1)
 		{
@@ -110,9 +116,10 @@ public:
 		NextObj(end) = nullptr;
 		_length -= n;
 	}
+	void* _head = nullptr;
 
 private:
-	void* _head = nullptr;
+	//void* _head = nullptr;
 	size_t _length = 0;//链表的长度
 	size_t _maxLength = 1;
 };
@@ -227,7 +234,7 @@ public:
 	void* _freeList = nullptr; //自由链表
 	size_t count = 0;//记录分配情况
 	bool _isUse = false;//记录当前sapn是否在使用
-	//size_t bytes = 0;
+	size_t _objSize = 0;//切割的每个对象的大小
 };
 
 class SpanList
@@ -240,14 +247,16 @@ public:
 		_head->_prev = _head;
 	}
 
-	void Push(Span* pos, Span* newSpan)
+	//pos的后面插入
+	void insert(Span* pos, Span* newSpan)
 	{
 		assert(pos);
 		assert(newSpan);
-		newSpan->_next = pos->_next;
+		Span* next = pos->_next;
 		pos->_next = newSpan;
 		newSpan->_prev = pos;
-		newSpan->_next->_prev = newSpan;
+		newSpan->_next = next;
+		next->_prev = newSpan;
 	}
 
 	void Pop(Span* pos)
@@ -256,7 +265,7 @@ public:
 		assert(pos != _head);//不能删头
 		Span* prev = pos->_prev;
 		prev->_next = pos->_next;
-		pos->_prev = prev;
+		pos->_next->_prev = prev;
 	}
 
 	Span* PopFront()
@@ -270,7 +279,7 @@ public:
 	//头插
 	void PushFront(Span* newSpan)
 	{
-		Push(_head, newSpan);
+		insert(_head, newSpan);
 	}
 
 	bool Empty()

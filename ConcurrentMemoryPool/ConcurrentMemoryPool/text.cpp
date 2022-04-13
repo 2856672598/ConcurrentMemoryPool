@@ -12,7 +12,7 @@ void fun1()
 		nums.push_back(ConcurrentAlloc(1023));
 	}
 	for (int i = 0; i < nums.size(); i++)
-		ConcurrentFree(nums[i], 1023);
+		ConcurrentFree(nums[i]);
 }
 
 void ConcurrentAlloc_Text()
@@ -25,41 +25,41 @@ void ConcurrentAlloc_Text()
 	//fun1();
 }
 
-int main()
-{
-	//set<int>s;
-	//set<int>nums;
-	//for (int i = 1; i <= 1024 * 256; i++)
-	//{
-	//	int align = SizeClass::AlignmentForSize(i);
-	//	if (s.insert(align).second)
-	//	{
-	//		//插入成功时输出下i的值
-	//		cout << "size:" << i << " " << align << endl;
-	//	}
-	//	//nums.insert(SizeClass::RoundUp(i));
-	//}
-	//for (auto e : s)
-	//	cout << e << " ";
-	//cout << s.size() << endl;
-
-	//cout << SizeClass::Index(128);
-
-	//cout << SizeClass().Index(128) << endl;
-
-	ConcurrentAlloc_Text();
-	//auto p = new ThreadCache;
-
-	//std::vector<void*>flag;
-	//for (int i = 0; i < 2; i++)
-	//{
-	//	flag.push_back(ConcurrentAlloc(129 * 8 * 1024));
-	//}
-	//for (auto e : flag)
-	//	ConcurrentFree(e, 129 * 8 * 1024);
-
-
-	//ConcurrentAlloc(1024);
-	//ConcurrentAlloc(7);
-	return 0;
-}
+//int main()
+//{
+//	//set<int>s;
+//	//set<int>nums;
+//	//for (int i = 1; i <= 1024 * 256; i++)
+//	//{
+//	//	int align = SizeClass::AlignmentForSize(i);
+//	//	if (s.insert(align).second)
+//	//	{
+//	//		//插入成功时输出下i的值
+//	//		cout << "size:" << i << " " << align << endl;
+//	//	}
+//	//	//nums.insert(SizeClass::RoundUp(i));
+//	//}
+//	//for (auto e : s)
+//	//	cout << e << " ";
+//	//cout << s.size() << endl;
+//
+//	//cout << SizeClass::Index(128);
+//
+//	//cout << SizeClass().Index(128) << endl;
+//
+//	ConcurrentAlloc_Text();
+//	//auto p = new ThreadCache;
+//
+//	//std::vector<void*>flag;
+//	//for (int i = 0; i < 2; i++)
+//	//{
+//	//	flag.push_back(ConcurrentAlloc(129 * 8 * 1024));
+//	//}
+//	//for (auto e : flag)
+//	//	ConcurrentFree(e, 129 * 8 * 1024);
+//
+//
+//	//ConcurrentAlloc(1024);
+//	//ConcurrentAlloc(7);
+//	return 0;
+//}
