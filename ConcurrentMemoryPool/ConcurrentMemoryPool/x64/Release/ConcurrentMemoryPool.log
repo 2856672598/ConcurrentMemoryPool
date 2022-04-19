@@ -1,0 +1,69 @@
+﻿  CenterCache.cpp
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\common.h(108): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\common.h(162): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\pagecache.h(20): warning C4267: “参数”: 从“size_t”转换到“const int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\centercache.cpp(38): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\centercache.cpp(80): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+  PageCache.cpp
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\common.h(108): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\common.h(162): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\pagecache.h(20): warning C4267: “参数”: 从“size_t”转换到“const int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\pagecache.cpp(12): warning C4311: “类型强制转换”: 从“void *”到“unsigned int”的指针截断
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\pagecache.cpp(12): warning C4302: “类型强制转换”: 从“void *”到“unsigned int”截断
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\pagecache.cpp(14): warning C4244: “参数”: 从“PAGE_ID”转换到“const int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\pagecache.cpp(15): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\pagecache.cpp(26): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\pagecache.cpp(32): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\pagecache.cpp(47): warning C4244: “参数”: 从“PAGE_ID”转换到“const int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\pagecache.cpp(48): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\pagecache.cpp(53): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\pagecache.cpp(63): warning C4311: “类型强制转换”: 从“void *”到“unsigned int”的指针截断
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\pagecache.cpp(63): warning C4302: “类型强制转换”: 从“void *”到“unsigned int”截断
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\pagecache.cpp(87): warning C4267: “参数”: 从“size_t”转换到“const int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\pagecache.cpp(91): warning C4267: “参数”: 从“size_t”转换到“const int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\pagecache.cpp(110): warning C4267: “参数”: 从“size_t”转换到“const int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\pagecache.cpp(113): warning C4267: “参数”: 从“size_t”转换到“const int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\pagecache.cpp(128): warning C4244: “参数”: 从“PAGE_ID”转换到“const int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\pagecache.cpp(129): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+  Performance.cpp
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\common.h(108): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\common.h(162): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\pagecache.h(20): warning C4267: “参数”: 从“size_t”转换到“const int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\performance.cpp(178): warning C4477: “printf”: 格式字符串“%u”需要类型“unsigned int”的参数，但可变参数 1 拥有了类型“size_t”
+  d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\performance.cpp(178): note: 请考虑在格式字符串中使用“%zu”
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\performance.cpp(178): warning C4477: “printf”: 格式字符串“%u”需要类型“unsigned int”的参数，但可变参数 2 拥有了类型“size_t”
+  d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\performance.cpp(178): note: 请考虑在格式字符串中使用“%zu”
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\performance.cpp(178): warning C4477: “printf”: 格式字符串“%u”需要类型“unsigned int”的参数，但可变参数 3 拥有了类型“unsigned __int64”
+  d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\performance.cpp(178): note: 请考虑在格式字符串中使用“%llu”
+  d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\performance.cpp(178): note: 请考虑在格式字符串中使用“%Iu”
+  d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\performance.cpp(178): note: 请考虑在格式字符串中使用“%I64u”
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\performance.cpp(232): warning C4477: “printf”: 格式字符串“%u”需要类型“unsigned int”的参数，但可变参数 1 拥有了类型“size_t”
+  d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\performance.cpp(232): note: 请考虑在格式字符串中使用“%zu”
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\performance.cpp(232): warning C4477: “printf”: 格式字符串“%u”需要类型“unsigned int”的参数，但可变参数 2 拥有了类型“size_t”
+  d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\performance.cpp(232): note: 请考虑在格式字符串中使用“%zu”
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\performance.cpp(232): warning C4477: “printf”: 格式字符串“%u”需要类型“unsigned int”的参数，但可变参数 3 拥有了类型“unsigned __int64”
+  d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\performance.cpp(232): note: 请考虑在格式字符串中使用“%llu”
+  d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\performance.cpp(232): note: 请考虑在格式字符串中使用“%Iu”
+  d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\performance.cpp(232): note: 请考虑在格式字符串中使用“%I64u”
+  text.cpp
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\common.h(108): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\common.h(162): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\pagecache.h(20): warning C4267: “参数”: 从“size_t”转换到“const int”，可能丢失数据
+  ThreadCache.cpp
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\common.h(108): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\common.h(162): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\pagecache.h(20): warning C4267: “参数”: 从“size_t”转换到“const int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\threadcache.cpp(12): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\threadcache.cpp(48): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\threadcache.cpp(56): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\threadcache.cpp(57): warning C4267: “参数”: 从“size_t”转换到“const _Ty”，可能丢失数据
+          with
+          [
+              _Ty=int
+          ]
+d:\githup\concurrentmemorypool\concurrentmemorypool\concurrentmemorypool\threadcache.cpp(63): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+  TraceLog.cpp
+  正在生成代码
+  All 678 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  已完成代码的生成
+  ConcurrentMemoryPool.vcxproj -> D:\Githup\ConcurrentMemoryPool\ConcurrentMemoryPool\x64\Release\ConcurrentMemoryPool.exe

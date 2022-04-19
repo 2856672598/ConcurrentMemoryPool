@@ -8,12 +8,13 @@ CentreCache CentreCache::_sInst;
 size_t CentreCache::FetchRangeObj(void*& start, void*& end, size_t bytes, size_t number)
 {
 	//获取下所在的桶
-	size_t index = SizeClass().Index(bytes);
+	size_t index = SizeClass::Index(bytes);
 	_spanList[index]._mlock.lock();
 
 	Span* span = GetOneSpan(bytes, number);
 
 	assert(span);
+	assert(span->_freeList);
 	span->_objSize = bytes;
 	start = span->_freeList;
 	//从list 中可以进行读取
@@ -22,8 +23,6 @@ size_t CentreCache::FetchRangeObj(void*& start, void*& end, size_t bytes, size_t
 	while (i < number - 1 && NextObj(end) != nullptr)
 	{
 		end = NextObj(end);
-		if ((unsigned)end == 2)
-			int i = 0;
 		i++;
 		count++;
 	}
@@ -36,10 +35,11 @@ size_t CentreCache::FetchRangeObj(void*& start, void*& end, size_t bytes, size_t
 
 Span* CentreCache::GetOneSpan(size_t bytes, size_t number)
 {
-	int index = SizeClass().Index(bytes);
-	Span* list = _spanList[index]._head;
-	Span* cur = list->_next;
-	while (cur != list)
+	int index = SizeClass::Index(bytes);
+	Span* head = _spanList[index]._head;//头结点
+	Span* cur = head->_next;
+	
+	while (cur != head)
 	{
 		if (cur->_freeList != nullptr)
 			return cur;
@@ -50,12 +50,14 @@ Span* CentreCache::GetOneSpan(size_t bytes, size_t number)
 	PageChche::GetInstance()->_mlock.lock();
 	//SpanList中没有未分配对象的span，去PageCache申请
 	Span*  newSpan = PageChche::GetInstance()->NewSpan(SizeClass::NnmMovePage(bytes));
+	newSpan->_isUse = true;
 	PageChche::GetInstance()->_mlock.unlock();
 	//将newSpan进行切割
+	newSpan->_objSize = bytes;
 	char* start = (char*)(newSpan->_pagId << kPageShift);
 	char* end = start + (newSpan->_npage << kPageShift);
+	
 
-	newSpan->_isUse = true;
 	newSpan->_freeList = start;
 	void* tail = start;
 	//newSpan->count = 0;
@@ -74,9 +76,11 @@ Span* CentreCache::GetOneSpan(size_t bytes, size_t number)
 
 void CentreCache::ReleaseToCentralCache(void* begin, int bytes)
 {
+
 	//访问CentreCache时，需要加上桶锁。
-	int index = SizeClass().Index(bytes);
+	int index = SizeClass::Index(bytes);
 	_spanList[index]._mlock.lock();
+	//__TRACE_DEBUG("(%d)\n", index);
 	void* cur = begin;
 	while (cur)
 	{
@@ -90,14 +94,18 @@ void CentreCache::ReleaseToCentralCache(void* begin, int bytes)
 		if (span->count == 0) {
 			_spanList[index].Pop(span);
 
-			//span->_isUse = false;
 			span->_freeList = nullptr;
 			span->_next = span->_prev = nullptr;
+			span->_objSize = 0;
 
+			//_spanList[index]._mlock.unlock();
 			//全部回收完成-->还给下一层的page
 			PageChche::GetInstance()->_mlock.lock();
 			PageChche::GetInstance()->ReleaseToPageCache(span);
 			PageChche::GetInstance()->_mlock.unlock();
+
+			//_spanList[index]._mlock.lock();
+
 		}
 		cur = next;
 	}

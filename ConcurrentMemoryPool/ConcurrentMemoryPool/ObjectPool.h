@@ -24,7 +24,7 @@ public:
 			//进行切割
 			ret = (T*)_memory;
 			//切割的最小为一个指针的大小。
-			size_t size = sizeof(T) < sizeof(void**) ? sizeof(void**) : sizeof(T);
+			size_t size = sizeof(T) < sizeof(void*) ? sizeof(void*) : sizeof(T);
 			_memorySize -= size;
 			_memory += size;
 		}
@@ -37,7 +37,7 @@ public:
 	{
 		//释放掉资源
 		ptr->~T();
-		NextObj(ptr) = _freeList;
+		*(void**)ptr = _freeList;
 		_freeList = ptr;
 	}
 private:

@@ -15,16 +15,14 @@ static void* ConcurrentAlloc(size_t size)
 
 		PageChche::GetInstance()->_mlock.lock();
 		Span* span = PageChche::GetInstance()->NewSpan(num_move);
-		PageChche::GetInstance()->_mlock.unlock();
-
 		span->_objSize = size;
+		PageChche::GetInstance()->_mlock.unlock();
 		return (void*)(span->_pagId << kPageShift);
 	}
 	if (TSLThreadCache == nullptr) {
 		static ObjectPool<ThreadCache>pool;
 
 		TSLThreadCache = pool.New();
-		//TSLThreadCache = new ThreadCache;
 	}
 	return TSLThreadCache->AllocateMemory(size);
 }

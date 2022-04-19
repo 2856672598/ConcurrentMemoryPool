@@ -20,5 +20,5 @@ private:
 	{}
 
 	static CentreCache _sInst;
-	SpanList _spanList[NSPANLIST];
+	SpanList _spanList[NFREELIST];
 };

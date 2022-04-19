@@ -11,7 +11,7 @@ void fun1()
 	{
 		nums.push_back(ConcurrentAlloc(1023));
 	}
-	for (int i = 0; i < nums.size(); i++)
+	for (size_t i = 0; i < (size_t)nums.size(); i++)
 		ConcurrentFree(nums[i]);
 }
 

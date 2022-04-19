@@ -2,12 +2,14 @@
 #include "ThreadCache.h"
 #include "CenterCache.h"
 #include "PageCache.h"
+#include "TraceLog.h"
 //申请空间
 void* ThreadCache::AllocateMemory(size_t bytes)
 {
+	__TRACE_DEBUG("(%u)\n", bytes);
 	//进行对齐
 	bytes = SizeClass::RoundUp(bytes);
-	int index = SizeClass().Index(bytes);
+	int index = SizeClass::Index(bytes);
 	if (!_freelist[index].Empty()) {
 		//可以申请
 		return _freelist[index].Pop();
@@ -32,9 +34,8 @@ void ThreadCache::ListTooLong(FreeList* list, int bytes)
 
 void  ThreadCache::FreeMemory(void* p, size_t size)
 {
-	//size = SizeClass::RoundUp(size);
+	size_t index = SizeClass::Index(size);
 
-	size_t index = SizeClass().Index(size);
 	_freelist[index].Push(p);
 	//当自由链表太长时需要进行回收
 	if (_freelist[index].Length() >= _freelist[index].MaxLength())
@@ -51,7 +52,7 @@ void* ThreadCache::FetchFromCentralCache(size_t cl, size_t bytes)
 	int num_to_move = std::min<int>(list->MaxLength(), batch_size);//申请的个数
 	if (num_to_move == list->MaxLength())
 		list->MaxLength() += 1;
-	cout << "申请" << num_to_move << " " << list->MaxLength() << endl;
+
 	void *start = nullptr, *end = nullptr;
 	//获取到的个数
 	int fetch_count = CentreCache::GetInstance()->FetchRangeObj(start, end, bytes, num_to_move);

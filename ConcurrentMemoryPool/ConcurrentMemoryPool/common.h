@@ -7,13 +7,14 @@
 #include <unordered_map>
 #include <algorithm>
 #include <Windows.h>
+#include "TraceLog.h"
 using std::cout;
 using std::endl;
 
 static const size_t kAlignment = 8;
 static const size_t kMaxSize = 1024 * 256;
 static const size_t NFREELIST = 104;//自由链表的个数。
-static const size_t NSPANLIST = 1024;
+static const size_t NSPANLIST = 104;
 static const size_t NPAGE = 129;
 static const size_t kPageShift = 13;
 
@@ -35,9 +36,9 @@ inline static void* SystemAlloc(size_t kpage)
 	// linux下brk mmap等
 #endif
 
-	if (ptr == nullptr)
+	if (ptr == nullptr) {
 		throw std::bad_alloc();
-	//cout << "申请" << kpage << "页" << endl;
+	}
 	return ptr;
 }
 
@@ -60,19 +61,16 @@ public:
 		assert(obj);
 		//头插
 		NextObj(obj) = _head;
-		if ((unsigned)_head == 2)
-			int i = 0;
 		_head = obj;
 		_length++;
 	}
 
 	void* Pop()
 	{
+		assert(_head);
 		if (_head != nullptr){
 			//自由链表不为空，直接弹出头节点.
 			void* obj = _head;
-			if ((unsigned)_head == 2)
-				int i = 0;
 			_head = NextObj(_head);
 			_length--;
 			return obj;
@@ -101,16 +99,16 @@ public:
 		_length += n;
 	}
 
-	void PopRange(void*& start, void*& end, int n)
+	void PopRange(void*& start, void*& end, size_t n)
 	{
+
 		assert(_length >= n);
 		start = _head;
 		end = start;
-		int flag = n;
-		while (flag > 1)
+		int flag = n - 1;
+		while (flag--)
 		{
 			end = NextObj(end);
-			flag--;
 		}
 		_head = NextObj(end);
 		NextObj(end) = nullptr;
@@ -126,18 +124,9 @@ private:
 
 class SizeClass
 {
+	SizeClass() = delete;
+	SizeClass(const SizeClass&) = delete;
 public:
-	SizeClass()
-	{
-		int align = 8;
-		int c = 0;
-		for (int i = align; i <= 1024 * 256; i += align)
-		{
-			index_arr[c++] = i;
-			if (align != AlignmentForSize(i))
-				align = AlignmentForSize(i);
-		}
-	}
 public:
 	static inline int LgFloor(size_t n) {
 		int log = 0;
@@ -184,21 +173,15 @@ public:
 	}
 
 	//桶的下标
-	size_t Index(size_t s)
-	{
-		for (int i = 0; i < NFREELIST; i++)
-		{
-			if (index_arr[i] == s)
-				return i;
-		}
-		return -1;
+	static size_t Index(size_t s)
+	{	
+		return m.find(s) != m.end() ? m[s] : -1;
 	}
 	
 	//计算出一次向中心缓存索要的个数。
 	static size_t NumMoveSize(size_t bytes)
 	{
 		if (bytes == 0) return 0;
-		// Use approx 64k transfers between thread and central caches.
 		int num = static_cast<int>(64 * 1024.0 / bytes);
 		if (num < 2)
 			num = 2;
@@ -220,9 +203,8 @@ public:
 	}
 
 private:
-	int index_arr[NFREELIST];
+	static std::unordered_map<size_t, int>m;//字节数和桶的映射
 };
-
 
 class Span
 {
@@ -265,6 +247,7 @@ public:
 		assert(pos != _head);//不能删头
 		Span* prev = pos->_prev;
 		prev->_next = pos->_next;
+
 		pos->_next->_prev = prev;
 	}
 

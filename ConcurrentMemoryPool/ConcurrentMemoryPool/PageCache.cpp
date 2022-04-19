@@ -12,6 +12,9 @@ Span* PageChche::NewSpan(size_t n)
 		span->_pagId = (unsigned)ptr >> kPageShift;
 		span->_npage = n;
 		pageNumberToSpanMap[span->_pagId] = span;
+		pageNumberToSpanMap[span->_pagId + span->_npage - 1] = span;
+		span->_objSize = n * 1024;
+		span->_isUse = true;
 		return span;
 	}
 
@@ -53,7 +56,6 @@ Span* PageChche::NewSpan(size_t n)
 			return span;
 		}
 	}
-	cout << "申请" << n << "页空间" << endl;
 	//没有找到合适的span进行切割-->去系统申请
 	void* ptr = SystemAlloc(NPAGE - 1);
 	Span* bigSpan = _objPool.New();
@@ -86,10 +88,14 @@ void PageChche::ReleaseToPageCache(Span* span)
 		}
 		//前面的span在使用
 		Span* prevSpan = pageNumberToSpanMap[prevId];
+		if (prevSpan == nullptr)
+			break;
 		if (prevSpan->_isUse == true || prevSpan->_npage + span->_npage >= NPAGE) {
 			break;
 		}
-
+		if (prevSpan->_isUse != false)
+			int i = 0;
+		assert(prevSpan->_isUse == false);
 		span->_npage += prevSpan->_npage;
 		span->_pagId = prevSpan->_pagId;
 		_pageLists[prevSpan->_npage].Pop(prevSpan);
@@ -120,6 +126,4 @@ void PageChche::ReleaseToPageCache(Span* span)
 	span->_isUse = false;
 	pageNumberToSpanMap[span->_pagId] = span;
 	pageNumberToSpanMap[span->_pagId + span->_npage - 1] = span;
-	cout << span->_npage << "页空间进行合并,线程ID" << std::this_thread::get_id() << endl;
-
 }
