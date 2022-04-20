@@ -60,7 +60,6 @@ Span* CentreCache::GetOneSpan(size_t bytes, size_t number)
 
 	newSpan->_freeList = start;
 	void* tail = start;
-	//newSpan->count = 0;
 	while (start + bytes < end)
 	{
 		NextObj(tail) = start + bytes;
@@ -80,7 +79,6 @@ void CentreCache::ReleaseToCentralCache(void* begin, int bytes)
 	//访问CentreCache时，需要加上桶锁。
 	int index = SizeClass::Index(bytes);
 	_spanList[index]._mlock.lock();
-	//__TRACE_DEBUG("(%d)\n", index);
 	void* cur = begin;
 	while (cur)
 	{
@@ -98,13 +96,13 @@ void CentreCache::ReleaseToCentralCache(void* begin, int bytes)
 			span->_next = span->_prev = nullptr;
 			span->_objSize = 0;
 
-			//_spanList[index]._mlock.unlock();
+			_spanList[index]._mlock.unlock();
 			//全部回收完成-->还给下一层的page
 			PageChche::GetInstance()->_mlock.lock();
 			PageChche::GetInstance()->ReleaseToPageCache(span);
 			PageChche::GetInstance()->_mlock.unlock();
 
-			//_spanList[index]._mlock.lock();
+			_spanList[index]._mlock.lock();
 
 		}
 		cur = next;

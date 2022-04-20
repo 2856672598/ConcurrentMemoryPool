@@ -114,10 +114,8 @@ public:
 		NextObj(end) = nullptr;
 		_length -= n;
 	}
-	void* _head = nullptr;
-
 private:
-	//void* _head = nullptr;
+	void* _head = nullptr;
 	size_t _length = 0;//链表的长度
 	size_t _maxLength = 1;
 };
@@ -154,10 +152,6 @@ public:
 		else if (size >= 128) {
 			alignment = (1 << LgFloor(size)) / 8;
 		}
-		//else if (size >= 16) {
-		//	//16 - 128字节按照 16对齐
-		//	alignment = 16;
-		//}
 		return alignment;
 	}
 
@@ -185,10 +179,8 @@ public:
 		int num = static_cast<int>(64 * 1024.0 / bytes);
 		if (num < 2)
 			num = 2;
-		//32768
 		if (num > 32768)
 			num = 32768;
-		//num = 1;
 		return num;
 	}
 

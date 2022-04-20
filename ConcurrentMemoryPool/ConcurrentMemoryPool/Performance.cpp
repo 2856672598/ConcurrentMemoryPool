@@ -33,19 +33,23 @@ void BenchmarkMalloc(int nWork, int nTimes, int rounds)
 		//创建nWork个线程
 		vthread[k] = std::thread([&]() {
 			std::vector<void*>nums;
+			nums.reserve(rounds);
 			for (int i = 0; i < nTimes; i++)
 			{
-				nums.reserve(rounds);
 				clock_t begin = clock();
 				for (int j = 0; j < rounds; j++)
 				{
-					int sz = (16 + i) % 1024 * 64 + 1;
-					nums.push_back(ConcurrentAlloc(sz));
-					*(int*)nums[j] = 2;
+					int sz = (16 + j) % 8192 + 1;
+					//int sz = 16;
+					nums.push_back(malloc(sz));
+					if (nums[j] == nullptr) {
+						throw std::bad_alloc();
+					}
+					*(char*)nums[j] = 'a';
 				}
 				for (int j = 0; j < rounds; j++)
 				{
-					ConcurrentFree(nums[j]);
+					free(nums[j]);
 				}
 				clock_t end = clock();
 				mallocTime += (end - begin);
@@ -55,7 +59,8 @@ void BenchmarkMalloc(int nWork, int nTimes, int rounds)
 	}
 	for (int i = 0; i < nWork; i++)
 		vthread[i].join();
-	cout << "BenchmarkMalloc耗时：" << mallocTime << endl;
+	cout << nWork << ":个线程，并发：" << nTimes << "次，BenchmarkMalloc耗时：" << mallocTime
+		<< "ms,共申请：" << nTimes * rounds << "个空间" << endl;
 }
 
 void BenchmarkConcurrentAlloc(int nWork, int nTimes, int rounds)
@@ -67,23 +72,20 @@ void BenchmarkConcurrentAlloc(int nWork, int nTimes, int rounds)
 		//创建nWork个线程
 		vthread[k] = std::thread([&]() {
 			std::vector<void*>nums;
+			nums.reserve(rounds);
 			for (int i = 0; i < nTimes; i++)
 			{
-				nums.reserve(rounds);
 				clock_t begin = clock();
 				for (int j = 0; j < rounds; j++)
 				{
-					int sz = (16 + i) % 1024 * 64 + 1;
-					nums.push_back((malloc(sz)));
-					if (nums[j] == nullptr) {
-						throw std::bad_alloc();
-					}
-					*(char*)nums[j] = 'a';
+					int sz = (16 + j) % 8192 + 1;
+					//int sz = 16;
+					nums.push_back(ConcurrentAlloc(sz));
+					*(int*)nums[j] = 2;
 				}
-
 				for (int j = 0; j < rounds; j++)
 				{
-					free(nums[j]);
+					ConcurrentFree(nums[j]);
 				}
 				clock_t end = clock();
 				concurrentAllocTime += (end - begin);
@@ -93,14 +95,16 @@ void BenchmarkConcurrentAlloc(int nWork, int nTimes, int rounds)
 	}
 	for (int i = 0; i < nWork; i++)
 		vthread[i].join();
+	cout << nWork << ":个线程，并发：" << nTimes << "次，BenchmarkConcurrentAlloc耗时：" << concurrentAllocTime 
+		<< "ms,共申请：" << nTimes * rounds << "个空间" << endl;
 
-	cout << "BenchmarkConcurrentAlloc耗时：" << concurrentAllocTime << endl;
 }
 
 int main()
 {
 	srand((unsigned)time(NULL));
-	BenchmarkMalloc(5, 10, 20000);
-	BenchmarkConcurrentAlloc(5, 10, 20000);
+	int n = 10000;
+	BenchmarkMalloc(4, 10, n);
+	BenchmarkConcurrentAlloc(4, 10, n);
 	return 0;
 }

@@ -11,8 +11,12 @@ Span* PageChche::NewSpan(size_t n)
 		//Span* span = new Span;
 		span->_pagId = (unsigned)ptr >> kPageShift;
 		span->_npage = n;
-		pageNumberToSpanMap[span->_pagId] = span;
-		pageNumberToSpanMap[span->_pagId + span->_npage - 1] = span;
+		//pageNumberToSpanMap[span->_pagId] = span;
+		//pageNumberToSpanMap[span->_pagId + span->_npage - 1] = span;
+
+		pageNumberToSpanMap.set(span->_pagId, span);
+		pageNumberToSpanMap.set(span->_pagId + span->_npage - 1, span);
+
 		span->_objSize = n * 1024;
 		span->_isUse = true;
 		return span;
@@ -23,8 +27,10 @@ Span* PageChche::NewSpan(size_t n)
 		Span* nSpan = _pageLists[n].PopFront();
 		for (size_t i = 0; i < nSpan->_npage; i++)
 		{
-			pageNumberToSpanMap[nSpan->_pagId + i] = nSpan;
+			//pageNumberToSpanMap[nSpan->_pagId + i] = nSpan;
+			pageNumberToSpanMap.set(nSpan->_pagId + i, nSpan);
 		}
+		nSpan->_isUse = true;
 		return nSpan;
 	}
 	//第n页的位置为空,需要向后面找非空位置进行切割
@@ -44,15 +50,19 @@ Span* PageChche::NewSpan(size_t n)
 			//将切割后剩余的iSpan 放到指定位置
 			_pageLists[iSpan->_npage].PushFront(iSpan);
 			//将切割后剩余的iSpan建立映射,方便进行合并
-			pageNumberToSpanMap[iSpan->_pagId] = iSpan;
-			pageNumberToSpanMap[iSpan->_pagId + iSpan->count - 1] = iSpan;
+			//pageNumberToSpanMap[iSpan->_pagId] = iSpan;
+			//pageNumberToSpanMap[iSpan->_pagId + iSpan->count - 1] = iSpan;
+
+			pageNumberToSpanMap.set(iSpan->_pagId, iSpan);
+			pageNumberToSpanMap.set(iSpan->_pagId + iSpan->count - 1, iSpan);
 
 			//将分出去的span和页号做映射。
 			for (size_t i = 0; i < span->_npage; i++)
 			{
-				pageNumberToSpanMap[span->_pagId + i] = span;
+				pageNumberToSpanMap.set(span->_pagId + i, span);
 			}
 
+			span->_isUse = true;
 			return span;
 		}
 	}
@@ -82,14 +92,14 @@ void PageChche::ReleaseToPageCache(Span* span)
 	while (true)
 	{
 		size_t prevId = span->_pagId - 1;
+		Span* prevSpan = (Span*)pageNumberToSpanMap.get(prevId);
 		//前面的位置不存在
-		if (pageNumberToSpanMap.find(prevId) == pageNumberToSpanMap.end()) {
+		if (prevSpan == nullptr) {
 			break;
 		}
+
 		//前面的span在使用
-		Span* prevSpan = pageNumberToSpanMap[prevId];
-		if (prevSpan == nullptr)
-			break;
+		//Span* prevSpan = pageNumberToSpanMap[prevId];
 		if (prevSpan->_isUse == true || prevSpan->_npage + span->_npage >= NPAGE) {
 			break;
 		}
@@ -106,10 +116,11 @@ void PageChche::ReleaseToPageCache(Span* span)
 	while (true)
 	{
 		size_t nextId = span->_pagId + span->_npage;
-		if (pageNumberToSpanMap.find(nextId) == pageNumberToSpanMap.end()) {
+		Span* nextSpan = (Span*)pageNumberToSpanMap.get(nextId);
+		if (nextSpan == nullptr) {
 			break;
 		}
-		Span* nextSpan = pageNumberToSpanMap[nextId];
+		//Span* nextSpan = pageNumberToSpanMap[nextId];
 		if (nextSpan->_isUse == true || nextSpan->_npage + span->_npage >= NPAGE) {
 			break;
 		}
@@ -124,6 +135,9 @@ void PageChche::ReleaseToPageCache(Span* span)
 	//将合并好的span添加到对应的桶中
 	_pageLists[span->_npage].PushFront(span);
 	span->_isUse = false;
-	pageNumberToSpanMap[span->_pagId] = span;
-	pageNumberToSpanMap[span->_pagId + span->_npage - 1] = span;
+	//pageNumberToSpanMap[span->_pagId] = span;
+	//pageNumberToSpanMap[span->_pagId + span->_npage - 1] = span;
+
+	pageNumberToSpanMap.set(span->_pagId, span);
+	pageNumberToSpanMap.set(span->_pagId + span->_npage - 1, span);
 }

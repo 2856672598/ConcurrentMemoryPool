@@ -1,7 +1,10 @@
-﻿  PageCache.cpp
+﻿  CenterCache.cpp
+  PageCache.cpp
+  Performance.cpp
+  text.cpp
+  ThreadCache.cpp
+  TraceLog.cpp
   正在生成代码
-  14 of 870 functions ( 1.6%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    3 functions had inline decision re-evaluated but remain unchanged
+  All 618 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   已完成代码的生成
   ConcurrentMemoryPool.vcxproj -> D:\Githup\ConcurrentMemoryPool\ConcurrentMemoryPool\Release\ConcurrentMemoryPool.exe

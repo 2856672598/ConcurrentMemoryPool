@@ -6,7 +6,6 @@
 //申请空间
 void* ThreadCache::AllocateMemory(size_t bytes)
 {
-	__TRACE_DEBUG("(%u)\n", bytes);
 	//进行对齐
 	bytes = SizeClass::RoundUp(bytes);
 	int index = SizeClass::Index(bytes);
