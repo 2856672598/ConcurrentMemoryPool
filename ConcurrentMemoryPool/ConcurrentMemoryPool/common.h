@@ -7,14 +7,13 @@
 #include <unordered_map>
 #include <algorithm>
 #include <Windows.h>
-#include "TraceLog.h"
 using std::cout;
 using std::endl;
 
-static const size_t kAlignment = 8;
+static const size_t kAlignment = 8;//默认对齐数
 static const size_t kMaxSize = 1024 * 256;
-static const size_t NFREELIST = 104;//自由链表的个数。
-static const size_t NSPANLIST = 104;
+static const size_t NFREELIST = 105;//自由链表的个数。
+static const size_t NSPANLIST = 105l;
 static const size_t NPAGE = 129;
 static const size_t kPageShift = 13;
 
@@ -126,7 +125,7 @@ class SizeClass
 	SizeClass(const SizeClass&) = delete;
 public:
 public:
-	static inline int LgFloor(size_t n) {
+	static  int LgFloor(size_t n) {
 		int log = 0;
 		for (int i = 4; i >= 0; --i) {
 			int shift = (1 << i);
@@ -141,6 +140,22 @@ public:
 	}
 
 	//返回指定大小的对齐数
+	/*
+	    字节				对齐数		区间内桶的数量
+		1--->127			8				16
+		128--->255			16				8
+		256--->511			32				8
+		512--->1023			64				8
+		1024--->2047		128				8
+		2048--->4095		256				8
+		4096--->8191		512				8
+		8192--->16383		1024			8
+		16384--->32767		2048			8
+		32768--->65535		4096			8
+		65536--->131071		8192			8
+		131072--->262143	16384			8
+		262144--->262144	32768
+	*/
 	static inline int AlignmentForSize(size_t size)
 	{
 		int alignment = kAlignment;
@@ -176,7 +191,7 @@ public:
 	static size_t NumMoveSize(size_t bytes)
 	{
 		if (bytes == 0) return 0;
-		int num = static_cast<int>(64 * 1024.0 / bytes);
+		int num = 64 * 1024 / bytes;
 		if (num < 2)
 			num = 2;
 		if (num > 32768)
@@ -195,7 +210,7 @@ public:
 	}
 
 private:
-	static std::unordered_map<size_t, int>m;//字节数和桶的映射
+	static std::unordered_map<size_t, int>m;//字节数和桶下标的映射
 };
 
 class Span

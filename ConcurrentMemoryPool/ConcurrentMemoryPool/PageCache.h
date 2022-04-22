@@ -7,13 +7,14 @@
 class PageChche
 {
 public:
+	std::mutex _mlock;
 	static PageChche* GetInstance()
 	{
 		return &_sInst;
 	}
 
 	Span* NewSpan(size_t n);
-	std::mutex _mlock;
+	void ReleaseToPageCache(Span* span);
 
 	Span* AddrToSpan(void* addr)
 	{
@@ -34,7 +35,6 @@ public:
 		return ret;
 	}
 
-	void ReleaseToPageCache(Span* span);
 private:
 	PageChche(const PageChche&) = delete;
 	PageChche()

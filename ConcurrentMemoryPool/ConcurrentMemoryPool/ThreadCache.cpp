@@ -2,7 +2,7 @@
 #include "ThreadCache.h"
 #include "CenterCache.h"
 #include "PageCache.h"
-#include "TraceLog.h"
+
 //申请空间
 void* ThreadCache::AllocateMemory(size_t bytes)
 {
@@ -24,7 +24,6 @@ void* ThreadCache::AllocateMemory(size_t bytes)
 
 void ThreadCache::ListTooLong(FreeList* list, int bytes)
 {
-	//size_t batch_size = SizeClass::NumMoveSize(bytes);
 	void* start = nullptr;
 	void *end = nullptr;
 	list->PopRange(start, end, list->MaxLength());
@@ -48,6 +47,7 @@ void* ThreadCache::FetchFromCentralCache(size_t cl, size_t bytes)
 	FreeList* list = &_freelist[cl];
 
 	int batch_size = SizeClass::NumMoveSize(bytes);
+	//使用慢增长
 	int num_to_move = std::min<int>(list->MaxLength(), batch_size);//申请的个数
 	if (num_to_move == list->MaxLength())
 		list->MaxLength() += 1;

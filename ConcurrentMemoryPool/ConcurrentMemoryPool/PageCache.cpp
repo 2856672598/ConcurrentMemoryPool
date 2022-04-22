@@ -62,7 +62,7 @@ Span* PageChche::NewSpan(size_t n)
 				pageNumberToSpanMap.set(span->_pagId + i, span);
 			}
 
-			span->_isUse = true;
+			span->_isUse = true;//将当前块的状态设置为在使用
 			return span;
 		}
 	}

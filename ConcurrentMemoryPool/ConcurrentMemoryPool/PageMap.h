@@ -23,6 +23,7 @@ public:
 
 	// REQUIRES "k" has been ensured before.
 	// 为键 'k' 设置值 'v'。
+	//k-->页号 v，span 的地址
 	void set(size_t k, void* v)
 	{
 		_array[k] = v;

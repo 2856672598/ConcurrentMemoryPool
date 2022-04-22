@@ -33,18 +33,12 @@
     <ClInclude Include="ObjectPool.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="TraceLog.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="PageMap.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThreadCache.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="text.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="CenterCache.cpp">
@@ -56,7 +50,7 @@
     <ClCompile Include="Performance.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="TraceLog.cpp">
+    <ClCompile Include="text.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

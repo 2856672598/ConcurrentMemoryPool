@@ -50,7 +50,6 @@ Span* CentreCache::GetOneSpan(size_t bytes, size_t number)
 	PageChche::GetInstance()->_mlock.lock();
 	//SpanList中没有未分配对象的span，去PageCache申请
 	Span*  newSpan = PageChche::GetInstance()->NewSpan(SizeClass::NnmMovePage(bytes));
-	newSpan->_isUse = true;
 	PageChche::GetInstance()->_mlock.unlock();
 	//将newSpan进行切割
 	newSpan->_objSize = bytes;

@@ -4,6 +4,7 @@
 #include <atomic>
 #include <stdio.h>
 
+//初始化桶下标
 std::unordered_map<size_t, int> Init()
 {
 	std::unordered_map<size_t, int>tmp;
@@ -11,8 +12,8 @@ std::unordered_map<size_t, int> Init()
 	int c = 0;
 	for (int i = align; i <= 1024 * 256; i += align)
 	{
-		tmp[i] = c;
-			align = SizeClass::AlignmentForSize(i);
+		tmp[i] = c++;
+		align = SizeClass::AlignmentForSize(i);
 	}
 	return tmp;
 }
@@ -100,11 +101,12 @@ void BenchmarkConcurrentAlloc(int nWork, int nTimes, int rounds)
 
 }
 
+
 int main()
 {
-	srand((unsigned)time(NULL));
-	int n = 10000;
-	BenchmarkMalloc(4, 10, n);
-	BenchmarkConcurrentAlloc(4, 10, n);
+	//int n = 10000;
+	//BenchmarkMalloc(4, 10, n);
+	//BenchmarkConcurrentAlloc(4, 10, n);
+	cout << sizeof(SystemAlloc(1));
 	return 0;
 }
